@@ -1,0 +1,19 @@
+{
+  "name": "drop-context-developer",
+  "description": "A Drupal developer agent grounded in Drop Context: it plans and implements features by consulting installed dc-* skills and the drop-context MCP docs for the release you actually run — reading contrib/core source only as a documented last resort.",
+  "version": "0.1.0",
+  "author": {
+    "name": "joaopauloctga"
+  },
+  "homepage": "https://dropcontext.dev",
+  "repository": "https://github.com/joaopauloctga/drop-context-developer",
+  "license": "MIT",
+  "keywords": [
+    "drupal",
+    "developer-agent",
+    "drop-context",
+    "mcp",
+    "agent-skills",
+    "claude-code"
+  ]
+}

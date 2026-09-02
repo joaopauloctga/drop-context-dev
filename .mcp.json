@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "drop-context": {
+      "type": "stdio",
+      "command": "drop-context-mcp",
+      "args": []
+    }
+  }
+}
