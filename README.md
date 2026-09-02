@@ -1,4 +1,4 @@
-# drop-context-developer — a grounded Drupal developer agent
+# drop-context-dev — a grounded Drupal developer agent
 
 A Claude Code plugin that ships the **Drop Context Developer**: a Drupal
 developer agent that plans and implements features by consulting the
@@ -10,6 +10,25 @@ catalog; fact missing from the docs; the doc was followed and didn't work),
 never the default.
 
 Why: fewer tokens per feature, and facts that match the installed release.
+
+## Installation
+
+```text
+/plugin marketplace add joaopauloctga/drop-context-dev
+/plugin install drop-context-dev@drop-context-dev
+```
+
+To update later:
+
+```text
+/plugin marketplace update drop-context-dev
+/plugin update drop-context-dev
+```
+
+Installing the plugin gives you the agent, the four `dc-*` workflow skills and
+the bundled `.mcp.json`. It does **not** give you the catalog: this is the
+consumer side, so the `drop-context` CLI below is a hard prerequisite — without
+the MCP server it registers, the agent has nothing to consult.
 
 ## Prerequisites
 
@@ -27,6 +46,24 @@ Why: fewer tokens per feature, and facts that match the installed release.
   ```bash
   claude mcp add drop-context --scope project -- drop-context-mcp
   ```
+
+## Releases and versioning
+
+The plugin carries a plain semver `version` in `.claude-plugin/plugin.json`,
+and each release is marked by a git tag of the form `{name}--v{version}` —
+`drop-context-dev--v0.1.0`. The tag is what a marketplace resolves an installed
+version against, so the two must not drift. `claude plugin tag` creates it, and
+refuses to if `plugin.json` and the enclosing marketplace entry disagree:
+
+```bash
+claude plugin validate .            # manifests well-formed?
+claude plugin tag --dry-run         # what would be tagged, without tagging
+claude plugin tag --push            # tag HEAD and push it to origin
+```
+
+`tag` also refuses on a dirty working tree, so a tag always points at committed
+state. Cutting a release is therefore: bump `version` in `plugin.json`, commit,
+`claude plugin tag --push`.
 
 ## What's inside
 
@@ -50,7 +87,7 @@ Why: fewer tokens per feature, and facts that match the installed release.
 Every task ends with a **grounding report** — which skills/MCP docs grounded
 the work, any pretraining facts and how they were validated, any source reads
 (with their justification case), and any doc gaps found. Doc gaps feed the
-producer side: the sibling [drop-context plugin](https://github.com/joaopauloctga/drupal-context-ai)
+producer side: the sibling [drop-context plugin](https://github.com/joaopauloctga/drop-context-plugin)
 can document an uncovered module straight from your repo's source.
 
 ## Relation to the drop-context producer plugin
@@ -59,13 +96,24 @@ Two plugins, two directions:
 
 - **drop-context** (producer): reads Drupal source in your repo → writes docs
   and `dc-*` skills. Zero network.
-- **drop-context-developer** (this, consumer): reads the published catalog via
+- **drop-context-dev** (this, consumer): reads the published catalog via
   MCP/CLI → builds features. Networked by nature; depends on the CLI.
 
 ## Local development
 
-This directory is the plugin. To test in a Drupal project without installing
-the plugin, symlink:
+This directory is the plugin — `.claude-plugin/marketplace.json` sits right
+here, so a local checkout can be added as a marketplace and installed from
+disk, with no publishing step:
+
+```text
+/plugin marketplace add /absolute/path/to/developer
+/plugin install drop-context-dev@drop-context-dev
+```
+
+Re-run `/plugin marketplace update drop-context-dev` after editing the manifests.
+
+To test in a Drupal project without going through the plugin system at all,
+symlink instead:
 
 ```bash
 ln -s <here>/agents/drop-context-developer.md <project>/.claude/agents/
