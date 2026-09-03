@@ -3,12 +3,12 @@
   "owner": {
     "name": "joaopauloctga"
   },
-  "description": "Consumer-side Drop Context tooling: the drop-context-developer agent and its workflow skills (dc-plan, dc-implement, dc-setup, dc-consult).",
+  "description": "Consumer-side Drop Context tooling: the drop-context-developer agent and its two workflow skills (dc-plan, dc-implement), grounded in the drop-context MCP.",
   "plugins": [
     {
       "name": "drop-context-dev",
       "source": "./",
-      "description": "A Drupal developer agent that consults Drop Context skills and MCP docs before ever reading module or core source. Requires the drop-context CLI (drop-context-mcp)."
+      "description": "A Drupal developer agent that plans and implements features from the drop-context MCP docs before ever reading module or core source. Requires the drop-context CLI (for the drop-context-mcp server)."
     }
   ]
 }
