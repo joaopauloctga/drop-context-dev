@@ -1,7 +1,7 @@
 {
   "name": "drop-context-dev",
   "description": "A Drupal developer agent grounded in the drop-context MCP: /dc-implement builds what you ask straight from the versioned module docs — matching modules you already run against modules worth installing — and /dc-plan writes a reviewable plan full of code and config examples first when you want one. Reads contrib/core source only as a documented last resort.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "joaopauloctga"
   },
