@@ -77,12 +77,15 @@ test -d .ddev && echo "wrapper: ddev"; test -f .lando.yml && echo "wrapper: land
 
 # Using the drop-context MCP
 
-Six read-only tools. They are named `mcp__drop-context__*`, or
-`mcp__plugin_drop-context-dev_drop-context__*` when the server comes from the
-plugin. If they are listed but not loaded, load them with ToolSearch (query
-`drop-context`). The parameter names below are exact: `get_module` and
-`get_doc` take **`module`**, which is the value of the `machine_name` field
-returned by `list_modules`. Do not pass a parameter named `machine_name`.
+Six read-only tools from the server named `drop-context`. Each client
+prefixes them its own way: `mcp__drop-context__list_modules` (or
+`mcp__plugin_drop-context-dev_drop-context__list_modules` from the plugin) in
+Claude Code, `drop-context_list_modules` in OpenCode. Match them by the bare
+tool names below. In Claude Code, if they are listed but not loaded, load them
+with ToolSearch (query `drop-context`). The parameter names below are exact:
+`get_module` and `get_doc` take **`module`**, which is the value of the
+`machine_name` field returned by `list_modules`. Do not pass a parameter
+named `machine_name`.
 
 | tool | arguments | returns |
 |---|---|---|
