@@ -9,12 +9,15 @@ Source reading is a documented last resort, never the default.
 
 Why: fewer tokens per feature, and facts that match the installed release.
 
-One agent, two skills:
+One agent, two skills. The skills are independent: each carries its own copy
+of the grounding discipline (sources of facts, MCP tools, version discipline,
+source-read cases, anti-fabrication) and of the Drupal rules, so either one
+works without the other.
 
 | skill | what it does |
 | --- | --- |
-| `/dc-plan <what needs to be done>` | Maps the project, matches the request against modules already installed and modules in the catalog worth installing, reads their docs, and writes a plan with concrete code and config examples to `.drop-context/plans/<slug>.md`. Runs in a forked context — only the path and a short summary come back. |
-| `/dc-implement <what needs to be done>` | Implements the request in the main context with the MCP as the source of truth: reads the project, matches modules (installed, core, or worth installing), reads their docs, installs what is needed, builds, verifies with drush and tests, and ends with a grounding report. A plan from `/dc-plan` is an optional head start, not a prerequisite. |
+| `/dc-plan <what needs to be done>` | Maps the project, matches the request against modules already installed, core, and modules in the catalog worth installing, reads their docs, and writes a self-contained plan to `.drop-context/plans/<slug>.md`. The plan holds concrete code and config examples, a `Check:` per step, and deploy notes, so a person or any agent can build from it. Runs in a forked context — only the path and a short summary come back. |
+| `/dc-implement <what needs to be done>` | Implements the request in the main context with the MCP as the source of truth: reads the project, matches modules (installed, core, or worth installing), reads their docs, installs what is needed, builds, verifies with drush and tests, makes it deployable, and ends with a grounding report. Any plan file (from `/dc-plan` or written by hand) is an optional head start: its facts are re-checked against the installed versions, never trusted blindly. |
 
 The `dc-*` skills published on dropcontext.dev (installed with the
 `drop-context` CLI) are for **you**, the human developer. The agent does not
@@ -69,8 +72,9 @@ for the agent.
 
 Every task ends with a **grounding report** — which MCP docs grounded the
 work, which modules were proposed or installed, any pretraining facts and how
-they were validated, any source reads (with their justification case), and any
-doc gaps found. Doc gaps feed the producer side: the sibling
+they were validated, any source reads (with their justification case), any
+doc gaps found, and what ships on deploy. A plan carries the same information
+in its last sections. Doc gaps feed the producer side: the sibling
 [drop-context plugin](https://github.com/joaopauloctga/drop-context-plugin) can
 document an uncovered module straight from your repo's source.
 
@@ -78,11 +82,23 @@ document an uncovered module straight from your repo's source.
 
 | path | what it is |
 | --- | --- |
-| `agents/drop-context-developer.md` | The agent: where facts come from, how to read the project, the MCP tools and doc ids, module matching, version discipline, the plan format, Drupal conduct, the grounding report. |
-| `skills/dc-plan/` | `/dc-plan` — forked planning run that writes the plan. |
-| `skills/dc-implement/` | `/dc-implement` — implements a request in the main context, directly or from a plan. |
-| `skills/dc-implement/references/drupal-rules.md` | The Drupal rules both skills load: events before hooks, verified and specific hooks, no logic in hooks, services by class name and injected (optional `@?` for other modules' services, deploy-safe), config schema + import/export cycle, access, cacheability per case, no queues/batches or tests unless asked, strict comment lengths with usage-documenting class docblocks. |
+| `agents/drop-context-developer.md` | The agent `/dc-plan` forks into, also usable directly: where facts come from, how to read the project, the MCP tools and doc ids, module matching, version discipline, a baseline of Drupal conduct, the grounding report. A skill's own procedure and rules take precedence over it. |
+| `skills/dc-plan/` | `/dc-plan` — forked planning run. Self-contained: owns the plan format and the procedure. |
+| `skills/dc-implement/` | `/dc-implement` — implements a request in the main context, directly or from any plan. Self-contained. |
+| `skills/*/references/drupal-rules.md` | The Drupal rules, one identical copy per skill: events before hooks, verified and specific hooks (`#[Hook]` on core ≥ 11.1), no logic in hooks, services by class name and injected (optional `@?` for other modules' services, deploy-safe), config schema + import/export cycle, access, cacheability per case, no queues/batches or tests unless asked, strict comment lengths with usage-documenting class docblocks, drush scripts turned into deployable artifacts, English only. |
 | `.mcp.json` | Registers `drop-context-mcp` (stdio) for projects using the plugin. |
+
+Content is duplicated between the skills on purpose. When you change a shared
+part, change it in both places. The rules files must stay byte-identical:
+
+```bash
+cmp skills/dc-plan/references/drupal-rules.md skills/dc-implement/references/drupal-rules.md
+```
+
+The shared sections of the two `SKILL.md` files ("Where facts come from",
+"The drop-context MCP", "Version discipline", "Reading contrib/core source",
+"Anti-fabrication") are written to read the same, apart from small
+differences of context. Diff them when you change one.
 
 ## Releases and versioning
 

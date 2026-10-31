@@ -1,9 +1,15 @@
-# Drupal rules for generated examples and implementation
+# Drupal rules for plans and implementation
 
-Loaded by /dc-plan (every example in a plan must already follow these) and by
-/dc-implement (every line of code and config written must follow these). Where
-a rule says "check the MCP", that means `get_doc` / `get_core_library_doc` on
-the drop-context MCP — never memory. Custom modules use the layout below.
+Every code or config example in a plan, and every line of code and config
+that gets implemented, follows these rules. When a rule says "check the
+MCP", it means calling `get_doc` / `get_core_library_doc` on the
+drop-context MCP. It never means relying on memory. Custom modules use the
+layout below; `web/` stands for the project's docroot.
+
+<!-- An identical copy of this file ships in each skill (dc-plan,
+     dc-implement) so neither depends on the other. Edit both; they must stay
+     byte-identical. -->
+
 
 ```text
 web/modules/custom/<module>/
@@ -11,7 +17,7 @@ web/modules/custom/<module>/
   <module>.services.yml             services registered by class name
   <module>.permissions.yml / <module>.routing.yml
   config/install/  config/optional/  config/schema/<module>.schema.yml
-  src/Hook/                          #[Hook] classes — no <module>.module file
+  src/Hook/                          #[Hook] classes — no <module>.module file (core ≥ 11.1)
   src/Services/                      business logic, injected everywhere
   src/Event/  src/EventSubscriber/   events you dispatch / subscribe to
   src/Plugin/ src/Controller/ src/Form/ src/Entity/
@@ -22,7 +28,7 @@ web/modules/custom/<module>/
 - **Events over hooks.** Before choosing a hook, read the module's `events`
   doc (`get_doc({module, doc: "events"})`). If the module dispatches an event
   that covers the need, subscribe to it. Only when no event fits, read
-  `hooks` and pick one — and say in the plan which doc decided it.
+  `hooks` and pick one. Say in the plan or the outline which doc decided it.
 - **Never assume a hook exists.** Every hook name comes from the MCP: the
   module's `hooks` doc; for hooks that core provides (entities, fields,
   forms, theme and preprocess, cron, …) the core module that owns them
@@ -44,11 +50,15 @@ web/modules/custom/<module>/
   unrelated to the hook's subject, computation that is not the hook's own
   purpose — lives in a service injected into the hook class; the hook only
   calls it.
-- **Hook attributes only.** `#[Hook('hook_name')]`
+- **Hook attributes on core ≥ 11.1.** Put `#[Hook('hook_name')]`
   (`Drupal\Core\Hook\Attribute\Hook`) on a method of a class under
   `src/Hook/`, with dependencies injected through the constructor. Never
   create or extend a `<module>.module` file. Confirm discovery and
   registration details for the installed core in the `Core/Hook` docs.
+  Older core does not have the attribute. Check with
+  `drush php:eval 'var_dump(class_exists(\Drupal\Core\Hook\Attribute\Hook::class));'`.
+  When it is missing, a procedural hook in `<module>.module` is the only
+  option, and its body is a one-line call to an injected service.
 - **Exposing your own extension point.** When a feature of your module is
   meant to be extended by other modules, dispatch an event — a dedicated
   event class under `src/Event/` with typed getters/setters and a name
@@ -167,8 +177,8 @@ web/modules/custom/<module>/
 ## 6. Access and security
 
 - Every route declares access: `_permission`, `_entity_access`,
-  `_custom_access` or `_role`. `_access: 'TRUE'` only for an intentionally
-  public endpoint, stated as such in the plan. Custom permissions go in
+  `_custom_access` or `_role`. Use `_access: 'TRUE'` only for an
+  intentionally public endpoint, and state that in the plan or the outline. Custom permissions go in
   `<module>.permissions.yml`, with `restrict access: true` for anything that
   can escalate privileges.
 - Entity queries call `->accessCheck(TRUE)`; `accessCheck(FALSE)` only where
@@ -199,9 +209,9 @@ web/modules/custom/<module>/
   or config that goes stale after that entity or config changes because its
   tag is missing.
 - Anything beyond that (custom cache tags for your own data, `#lazy_builder`
-  for one uncacheable fragment, a dedicated cache bin) is a proposal in the
-  plan with the case for it — implemented when the user agrees, not by
-  default.
+  for one uncacheable fragment, a dedicated cache bin) is a proposal. Make
+  it in the plan or the outline, with the case for it. Implement it only
+  when the user agrees, never by default.
 
 ## 8. Heavy work — no over-engineering
 
