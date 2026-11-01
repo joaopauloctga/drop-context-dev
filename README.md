@@ -37,6 +37,23 @@ To update later:
 /plugin update drop-context-dev
 ```
 
+### Cursor, Codex, OpenCode (and Claude Code without the plugin)
+
+The drop-context CLI installs this repository into a Drupal project for every
+coding agent it uses — skills, the agent in each client's own format, and the
+MCP server registration:
+
+```bash
+cd <drupal-project>
+drop-context dev:install                          # coding agents found in the project
+drop-context dev:install --code-agents=.cursor    # or pick them
+drop-context dev:remove
+```
+
+See the [CLI README](https://github.com/joaopauloctga/drop-context#install-the-drop-context-developer)
+for what goes where. Invoke the skills as `/dc-plan` and `/dc-implement`
+(`$dc-plan` / `$dc-implement` in Codex).
+
 ## Prerequisites
 
 The plugin bundles an `.mcp.json` that registers the `drop-context-mcp` stdio

@@ -16,10 +16,14 @@ argument-hint: <what needs to be done — or the path/slug of a plan>
 
 Input: $ARGUMENTS
 
+If the line above still shows a literal `$ARGUMENTS` placeholder, your client
+did not substitute it: the input is the user's message that invoked this
+skill.
+
 You work in the main context so the user sees every change. Everything this
-skill needs is in this file and in
-`${CLAUDE_SKILL_DIR}/references/drupal-rules.md`. It relies on no other skill
-or agent. A plan, when one exists, is only an input.
+skill needs is in this file and in `references/drupal-rules.md`, next to
+it. It relies on no other skill or agent. A plan, when one exists, is only
+an input.
 
 ## Where facts come from
 
@@ -42,10 +46,13 @@ class/service/method exists on **this** site. Never use it for contrib.
 
 ## The drop-context MCP
 
-The tools are named `mcp__drop-context__*`. When the server comes from the
-plugin, they are named `mcp__plugin_drop-context-dev_drop-context__*`. If they
-are listed but not loaded, load them with ToolSearch (query `drop-context`). If
-no drop-context tool exists at all, stop and tell the user:
+The server is named `drop-context`, and each client prefixes its six tools
+its own way: `mcp__drop-context__list_modules` (or
+`mcp__plugin_drop-context-dev_drop-context__list_modules` from the plugin) in
+Claude Code, `drop-context_list_modules` in OpenCode. Match them by the bare
+tool names below. In Claude Code, if they are listed but not loaded, load them
+with ToolSearch (query `drop-context`). If no drop-context tool exists at all,
+stop and tell the user:
 `drop-context MCP unavailable — install the CLI (composer global require
 joaopauloctga/drop-context) and make sure drop-context-mcp is on PATH.`
 
@@ -172,10 +179,12 @@ works. Plans in the drop-context format carry these sections: `## Modules`,
    - Before the first command that writes (`en`, `cim`, `cex`, `updb`,
      `config:set`, a mutating `php:eval`), confirm with `drush status` that
      the target is the local site.
-2. **Load the rules.** Read `${CLAUDE_SKILL_DIR}/references/drupal-rules.md`.
-   If that path did not resolve, read `references/drupal-rules.md` next to
-   this SKILL.md. The rules govern every line you write, and they override
-   habit and pretraining. They cover the following:
+2. **Load the rules.** Read `references/drupal-rules.md` in this skill's
+   directory (`${CLAUDE_SKILL_DIR}/references/drupal-rules.md` where the
+   client expands that variable). If the directory is unknown, find the file
+   by globbing for `dc-implement/references/drupal-rules.md`. The rules
+   govern every line you write, and they override habit and pretraining.
+   They cover the following:
    - events before hooks, with every hook verified through the MCP and as
      specific as possible
    - `#[Hook]` classes on core ≥ 11.1, with no business logic in hooks

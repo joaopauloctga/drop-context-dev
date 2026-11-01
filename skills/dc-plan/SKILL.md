@@ -18,6 +18,11 @@ argument-hint: <what needs to be done>
 
 Request: $ARGUMENTS
 
+If the line above still shows a literal `$ARGUMENTS` placeholder, your client
+did not substitute it: the request is the user's message that invoked this
+skill. In Claude Code this skill runs forked into the `drop-context-developer`
+agent; other clients may run it inline. The procedure is the same either way.
+
 You are planning, not implementing. The only file you write is the plan (and
 its directory). Do not create or edit project code or config. Do not run
 `composer require`, `drush en`, `cim`, `cex`, `cr`, or a `php:eval` that
@@ -28,8 +33,8 @@ The plan is the whole hand-off. Whoever builds it (a person, /dc-implement,
 another agent) starts with only this file and the project. Put everything they
 need in the plan: versions, the docs release behind each fact, the code and
 config, the commands, and each decision with its reason. Everything this run
-needs is in this file and in `${CLAUDE_SKILL_DIR}/references/drupal-rules.md`.
-It relies on no other skill.
+needs is in this file and in `references/drupal-rules.md`, next to it. It
+relies on no other skill.
 
 - **Empty request:** return one line asking what to plan, and do nothing else.
 - **Ambiguous request:** pick the most useful interpretation, write it under
@@ -58,10 +63,13 @@ Never use it for contrib.
 
 ## The drop-context MCP
 
-The tools are named `mcp__drop-context__*`. When the server comes from the
-plugin, they are named `mcp__plugin_drop-context-dev_drop-context__*`. If they
-are listed but not loaded, load them with ToolSearch (query `drop-context`). If
-no drop-context tool exists at all, stop and return:
+The server is named `drop-context`, and each client prefixes its six tools
+its own way: `mcp__drop-context__list_modules` (or
+`mcp__plugin_drop-context-dev_drop-context__list_modules` from the plugin) in
+Claude Code, `drop-context_list_modules` in OpenCode. Match them by the bare
+tool names below. In Claude Code, if they are listed but not loaded, load them
+with ToolSearch (query `drop-context`). If no drop-context tool exists at all,
+stop and return:
 `drop-context MCP unavailable — install the CLI (composer global require
 joaopauloctga/drop-context) and make sure drop-context-mcp is on PATH.`
 
@@ -148,10 +156,11 @@ hit. Never open the module and browse. "Just confirming", "it's faster" and
 1. **Preflight.** Make sure the MCP tools are available (see above). Make sure
    this is a Drupal project: `composer.lock` lists `drupal/core`. If it does
    not, return one line saying so.
-2. **Load the rules.** Read `${CLAUDE_SKILL_DIR}/references/drupal-rules.md`.
-   If that path did not resolve, read `references/drupal-rules.md` next to
-   this SKILL.md. Every decision and every example in the plan follows these
-   rules. They cover the following:
+2. **Load the rules.** Read `references/drupal-rules.md` in this skill's
+   directory (`${CLAUDE_SKILL_DIR}/references/drupal-rules.md` where the
+   client expands that variable). If the directory is unknown, find the file
+   by globbing for `dc-plan/references/drupal-rules.md`. Every decision and
+   every example in the plan follows these rules. They cover the following:
    - events before hooks, with every hook verified through the MCP and as
      specific as possible
    - `#[Hook]` classes on core ≥ 11.1, with no business logic in hooks
